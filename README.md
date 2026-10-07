@@ -2,7 +2,7 @@
 
 个人博客与工程实践记录。基于 Astro、Pure、React 和 UnoCSS，沿用参考站的布局、导航与交互终端，内容为 Alinerml 个人版本。
 
-在线访问：[Alinerml · 工程笔记](https://alinerml.github.io/) · [源码仓库](https://github.com/Alinerml/Alinerml.github.io)。GitHub Pages 已发布，公网浏览器检查通过；目前尚未配置线上评论服务。
+在线访问：[Alinerml · 工程笔记](https://alinerml.github.io/) · [源码仓库](https://github.com/Alinerml/Alinerml.github.io)。GitHub Pages 已发布，评论服务为 [独立 Waline 服务](https://alinerml-waline.vercel.app)。验证范围见 `VERIFICATION.md`。
 
 ## 本地运行
 
@@ -67,9 +67,11 @@ npm run preview
 
 ## 评论与点赞
 
-独立服务源码、数据库初始化与部署步骤在 `services/waline/`。GitHub Pages 只托管博客，不执行该服务。
+独立服务源码、数据库初始化与部署步骤在 `services/waline/`。博客使用 Vercel 上的 Waline 和 Neon PostgreSQL 专用数据库，GitHub Pages 只托管博客。管理员入口为 https://alinerml-waline.vercel.app/ui。
 
-在 Vercel Hobby 部署 `services/waline`，连接 Neon Free，执行该目录的 `waline.pgsql`。配置 SITE_URL、SITE_NAME 和服务端 JWT_TOKEN 后，注册首个管理员账号。再把自己的服务地址填入 `src/data/waline.json`，或设置 GitHub Repository Variable `PUBLIC_WALINE_SERVER_URL`。
+迁移到其他账号时，在 Vercel Hobby 部署 `services/waline`，连接 Neon Free，并在专用空数据库执行该目录的 `waline.pgsql`。配置 SITE_URL、SITE_NAME 和服务端 JWT_TOKEN，再把自己的服务地址填入 `src/data/waline.json`，或设置 GitHub Repository Variable `PUBLIC_WALINE_SERVER_URL`。服务器和数据库地址之外的凭据均只配置在 Vercel 服务端。
+
+当前评论以游客方式开放，昵称必填。公开注册和 OAuth 默认关闭，防止首个管理员被他人注册占用；管理员只能先经私有本机入口或受保护部署初始化，再使用公开 `/ui` 登录管理。详见服务目录的 README。
 
 未配置评论服务时隐藏评论区；服务故障时显示重新加载。没有使用原作者评论地址，也不以浏览器存储假装共享评论。Vercel/Neon 免费方案均有额度限制，Vercel Hobby 限个人非商业用途。
 

@@ -20,8 +20,9 @@ process.env.PG_SSL ||= 'true';
 process.env.PG_PORT ||= '5432';
 
 const Waline = require('@waline/vercel');
-module.exports = Waline({
+const handler = Waline({
   model: require('./comment-model.cjs'),
   secureDomains: [new URL(process.env.SITE_URL || 'https://Alinerml.github.io').hostname, process.env.VERCEL_PROJECT_PRODUCTION_URL, process.env.VERCEL_URL]
     .filter(Boolean)
 });
+module.exports = require('./registration-guard.cjs')(handler);

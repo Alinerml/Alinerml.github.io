@@ -1,6 +1,7 @@
 *
 !index.cjs
 !comment-model.cjs
+!registration-guard.cjs
 !package.json
 !package-lock.json
 !vercel.json

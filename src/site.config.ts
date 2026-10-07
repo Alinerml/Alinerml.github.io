@@ -66,7 +66,7 @@ export const integ: IntegrationUserConfig = {
       pageview: false,
       comment: false,
       dark: 'html.dark',
-      login: 'enable',
+      login: 'disable',
       requiredMeta: ['nick']
     }
   }

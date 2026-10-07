@@ -69,7 +69,7 @@ npm run preview
 
 独立服务源码、数据库初始化与部署步骤在 `services/waline/`。博客使用 Vercel 上的 Waline 和 Neon PostgreSQL 专用数据库，GitHub Pages 只托管博客。管理员入口为 https://alinerml-waline.vercel.app/ui。
 
-迁移到其他账号时，在 Vercel Hobby 部署 `services/waline`，连接 Neon Free，并在专用空数据库执行该目录的 `waline.pgsql`。配置 SITE_URL、SITE_NAME 和服务端 JWT_TOKEN，再把自己的服务地址填入 `src/data/waline.json`，或设置 GitHub Repository Variable `PUBLIC_WALINE_SERVER_URL`。服务器和数据库地址之外的凭据均只配置在 Vercel 服务端。
+迁移到其他账号时，在 Vercel Hobby 部署 `services/waline`，连接 Neon Free，并在专用空数据库执行该目录的 `waline.pgsql`。配置 SITE_URL、SITE_NAME 和服务端 JWT_TOKEN，再把自己的服务地址填入 `src/data/waline.json`，或设置 GitHub Repository Variable `PUBLIC_WALINE_SERVER_URL`。数据库连接凭据与 JWT 密钥只配置在 Vercel 服务端。
 
 当前评论以游客方式开放，昵称必填。公开注册和 OAuth 默认关闭，防止首个管理员被他人注册占用；管理员只能先经私有本机入口或受保护部署初始化，再使用公开 `/ui` 登录管理。详见服务目录的 README。
 

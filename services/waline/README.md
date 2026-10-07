@@ -26,7 +26,7 @@ Node.js 24.15+，在此目录运行 `npm ci`、`npm run dev`，服务监听 http
 
 博客目前隐藏访客登录入口，游客填写昵称即可留言。公开注册保持关闭，管理员凭据由站主在私有初始化页面亲自输入，不提交到仓库或博客构建。
 
-保护路由测试：`node test/registration-guard.test.cjs`；GitHub Pages 工作流也会执行该检查。
+保护路由测试：`node test/registration-guard.test.cjs`；SQL 日志、TLS 与更新回读测试：`node --test test/sql-model.test.cjs`。GitHub Actions 中独立的 Waline 工作流执行这些检查。
 
 ## SQL 存储兼容
 

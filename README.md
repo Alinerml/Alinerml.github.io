@@ -2,6 +2,8 @@
 
 个人博客与工程实践记录。基于 Astro、Pure、React 和 UnoCSS，沿用参考站的布局、导航与交互终端，内容为 Alinerml 个人版本。
 
+在线访问：[Alinerml · 工程笔记](https://alinerml.github.io/) · [源码仓库](https://github.com/Alinerml/Alinerml.github.io)。GitHub Pages 已发布，公网浏览器检查通过；目前尚未配置线上评论服务。
+
 ## 本地运行
 
 推荐 Node.js 24.15+（已用 24 系列验证）。
@@ -57,7 +59,7 @@ npm run preview
 
 ## GitHub Pages
 
-已提供 `.github/workflows/pages.yml`。目标是公开仓库 `Alinerml/Alinerml.github.io`，Pages 的 Source 选择 GitHub Actions。提交到 main 后，会检查、构建并发布 dist。
+已配置 `.github/workflows/pages.yml`，公开仓库为 `Alinerml/Alinerml.github.io`，Pages 的 Source 为 GitHub Actions。提交到 main 后，会检查、构建并发布 dist。
 
 站点使用根路径，因此若改为项目仓库子路径，需要进一步适配 Astro base 和站内资源路径。`PUBLIC_SITE_URL` 可以覆盖 canonical/RSS 基准域名；自定义域名时也要同步 robots、Actions 与 SITE_URL。
 

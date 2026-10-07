@@ -1,8 +1,18 @@
 # 验证与交付状态
 
-验证日期：2026-10-07。本地检查已通过，当前正在发布到 GitHub Pages。
+验证日期：2026-10-07。本地检查及公网浏览器检查已通过，网站已发布到 [GitHub Pages](https://alinerml.github.io/)。
 
-## 已通过
+## 线上发布已验证
+
+- 源码已推送到公开仓库 [Alinerml/Alinerml.github.io](https://github.com/Alinerml/Alinerml.github.io)，Pages 使用 GitHub Actions 构建。
+- [首次 Astro 发布工作流](https://github.com/Alinerml/Alinerml.github.io/actions/runs/37639422092)成功完成依赖安装、类型检查、生产构建、输出验证和部署。
+- 公网首页返回 HTTP 200，站点标题、个人简介和头像正确。
+- 公网 Edge 浏览器验证通过：主题切换与刷新保留、终端及文章内联阅读、快捷搜索、数学公式和代码复制。
+- 搜索索引、终端文章数据、RSS 和 sitemap 均可公开访问。
+- 390px 手机宽度下主要页面无横向溢出，导航展开和跳转正常。
+- 未出现站内 HTTP 4xx/5xx、未捕获脚本错误或对本地评论服务的请求。线上评论地址为空时，评论区正确隐藏。
+
+## 本地验证已通过
 
 - Astro 类型检查：71 个文件，0 errors / 0 warnings / 0 hints。
 - 生产构建：22 个页面；另有兼容跳转页面。
@@ -30,10 +40,9 @@
 
 ## 待线上配置与验证
 
-- GitHub Pages 发布进行中，待云端构建及公网访问检查完成。
 - Vercel / Neon 需要站主自己的账号配置。服务端源码、SQL 和变量示例已提供，未创建线上资源。
 - PostgreSQL 评论更新与 SQLite 共用兼容适配，但尚未连接 Neon 实测。
-- 首个管理员注册、登录、邮件通知及实际公网访问尚未验证。
+- 线上评论服务的首个管理员注册、登录、邮件通知及公网读写尚未验证。
 - Astro Pure 使用的旧 Markdown 插件接口仍会产生依赖弃用提示，当前检查、构建和浏览器功能通过。
 
 ## 运行

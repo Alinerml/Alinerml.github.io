@@ -1,0 +1,20 @@
+---
+import { site } from '@/data/site'
+import PageLayout from '@/layouts/CommonPage.astro'
+const headings = [{depth:2,slug:'about-me',text:'关于我'},{depth:2,slug:'building',text:'我关注的工作'},{depth:2,slug:'principles',text:'我的工程习惯'},{depth:2,slug:'about-blog',text:'关于这个博客'}]
+---
+<PageLayout title='About' {headings}>
+  <img src='/assets/avatar.webp' width='112' height='112' alt='Alinerml 的 GitHub 头像' class='rounded-full' />
+  <h2 id='about-me'>关于我</h2>
+  <p>你好，我是 {site.nickname}。我关注全栈业务系统与 AI 辅助开发，习惯从具体的使用流程出发，把问题逐步落实到代码、配置和可复现的验证。</p>
+  <p>{site.introduction}</p>
+  <h2 id='building'>我关注的工作</h2>
+  <p>近期的工程实践主要围绕 CRM 与客服工作台、微信小程序、CloudBase，以及 AI 回复与反馈记录展开。既关注界面是否顺手，也关注身份、数据范围和部署边界是否清楚。</p>
+  <p>另一部分时间用来整理 Windows、WSL、Git 与 Docker 环境中的问题。把一次排查写成可以复用的记录，下一次遇到相似问题就能更快找到依据。</p>
+  <p><a href='/projects/'>查看工程实践</a></p>
+  <h2 id='principles'>我的工程习惯</h2>
+  <ul><li>从实际调用链确认行为，避免用框架惯例代替代码证据。</li><li>保留输入、上下文和验证范围，方便后来复盘。</li><li>区分本地测试、CI、受控浏览器与真实环境验证。</li><li>先把一条业务流程跑通，再判断下一步应该扩展什么。</li></ul>
+  <h2 id='about-blog'>关于这个博客</h2>
+  <p>这里记录项目实践、工程判断和学习笔记。文章侧重方法与可公开的经验，不包含业务数据和私人配置。</p>
+  <p>界面基于 <a href='https://github.com/joyehuang/blog' target='_blank' rel='noopener noreferrer'>joyehuang/blog</a> 与 <a href='https://github.com/lizaixi01/lizaixi01.github.io' target='_blank' rel='noopener noreferrer'>Zaixi 的静态站适配</a>，使用 Astro 和 Pure 主题。</p>
+</PageLayout>

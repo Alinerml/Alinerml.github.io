@@ -1,0 +1,17 @@
+---
+import { site } from '@/data/site'
+import PageLayout from '@/layouts/CommonPage.astro'
+import Gmail from '@/components/Gmail.astro'
+import ContactQR from '@/components/contact/ContactQR.astro'
+const headings = [{depth:2,slug:'reach-me',text:'联系我'},{depth:2,slug:'topics',text:'可以聊什么'}]
+---
+<PageLayout title='Contact' {headings}>
+  <p>{site.contactIntroduction}</p>
+  <h2 id='reach-me'>联系我</h2>
+  <p><a href={site.github} target='_blank' rel='noopener noreferrer'>GitHub · Alinerml</a></p>
+  <div class='not-prose my-4 flex flex-wrap gap-3'><a class='rounded-full border px-4 py-2 hover:bg-muted' href={site.github} target='_blank' rel='noopener noreferrer'>访问 GitHub 主页</a><button class='rounded-full border px-4 py-2 hover:bg-muted' data-copy={site.github}>复制主页地址</button></div>
+  {site.email && <div class='not-prose my-4 flex flex-wrap items-center gap-4'><Gmail /><button class='rounded-full border px-3 py-1.5 hover:bg-muted' data-copy={site.email}>复制邮箱</button></div>}
+  {site.wechatQr && <div class='not-prose my-6'><ContactQR items={[{name:'微信',hint:'悬停、轻点或按 Enter 显示二维码',image:site.wechatQr,methodName:'wechat',note:'微信扫一扫，添加好友'}]} /></div>}
+  <h2 id='topics'>可以聊什么</h2>
+  <ul><li>CRM、客服工作台与门店业务流程。</li><li>微信小程序、原生登录与云开发。</li><li>AI 回复、反馈记录和工程验证。</li><li>Windows / WSL、Git 与 Docker 开发环境。</li></ul>
+</PageLayout>

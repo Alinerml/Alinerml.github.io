@@ -1,0 +1,19 @@
+---
+import { getCollection, render } from 'astro:content'
+import { projects, type Project } from '@/data/site'
+import PageLayout from '@/layouts/CommonPage.astro'
+import MediumZoom from '@/components/MediumZoom.astro'
+export function getStaticPaths() { return projects.map(project => ({params:{id:project.id},props:{project}})) }
+interface Props { project: Project }
+const { project } = Astro.props
+const entry = (await getCollection('cases')).find(item => item.data.project === project.id)
+const rendered = entry ? await render(entry) : null
+const Content = rendered?.Content
+const headings = rendered?.headings ?? [{depth:2,slug:'focus',text:'关注什么'},{depth:2,slug:'scope',text:'实践范围'}]
+---
+<PageLayout title={project.name} {headings} back='/projects/'>
+  <p>{project.description}</p><p class='text-sm'>{project.status}<br />{project.tech}</p>
+  {Content ? <Content /> : <><h2 id='focus'>关注什么</h2><p>{project.focus}</p><h2 id='scope'>实践范围</h2><p>{project.boundary}</p></>}
+  <p><a href={project.url} target='_blank' rel='noopener noreferrer'>{project.linkLabel || '相关资料'}</a></p>
+</PageLayout>
+<MediumZoom />

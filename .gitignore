@@ -1,0 +1,14 @@
+work/
+outputs/
+.playwright-cli/
+node_modules/
+.astro/
+dist/
+.reference/
+.env
+.env.*
+!.env.example
+.vercel/
+.local/
+.sites-runtime/
+.local-preview/

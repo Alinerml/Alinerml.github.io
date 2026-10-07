@@ -1,0 +1,54 @@
+---
+import { Image } from 'astro:assets'
+import { getCollection } from 'astro:content'
+import { projects, site } from '@/data/site'
+import { PostPreview } from 'astro-pure/components/pages'
+import { Button, Icon, Label } from 'astro-pure/user'
+import PageLayout from '@/layouts/BaseLayout.astro'
+import LinkCard from '@/components/home/LinkCard.astro'
+import Section from '@/components/home/Section.astro'
+import SkillLayout from '@/components/home/SkillLayout.astro'
+import Terminal from '@/components/terminal/Terminal.astro'
+import avatar from '@/assets/avatar.webp'
+const posts = (await getCollection('blog')).sort((a, b) => a.data.order - b.data.order)
+---
+<PageLayout meta={{ title: 'Home', description: site.introduction }} highlightColor='#659EB9'>
+  <main id='main' class='flex w-full flex-col items-center'>
+    <section class='animate mb-10 flex flex-col items-center gap-y-7 relative z-50' id='content-header'>
+      <Image src={avatar} alt='Alinerml 的 GitHub 头像' class='h-28 w-28 object-cover rounded-full border p-1' loading='eager' fetchpriority='high' />
+      <div class='flex flex-col items-center gap-y-4'>
+        <h1 class='text-3xl font-bold'>{site.nickname}</h1>
+        <div class='flex flex-wrap justify-center gap-x-7 gap-y-3'>
+          <Label title={site.description} />
+          <Label title='GitHub' as='a' href={site.github} target='_blank' rel='noopener noreferrer'><Icon name='github' class='size-5' slot='icon' /></Label>
+        </div>
+      </div>
+      <a href='/contact/' class='flex flex-row items-center gap-x-3 rounded-full border bg-background px-4 py-2 text-sm shadow-sm transition-shadow hover:shadow-md'>交流与联系</a>
+    </section>
+    <div id='content' class='animate relative z-0 flex w-full min-w-0 max-w-full flex-col gap-y-10 md:w-4/5 lg:w-5/6'>
+      <div class='-mt-2'><Terminal /></div>
+      <Section title='About'>
+        <p class='text-muted-foreground'>{site.introduction}</p>
+        <p class='text-muted-foreground'>这里记录 CRM、微信小程序、CloudBase 与 AI 辅助开发中的设计判断和工程实践。</p>
+        <p class='text-muted-foreground' lang='en'>{site.englishIntroduction}</p>
+        <Button title='了解更多' class='w-fit self-end' href='/about/' variant='ahead' />
+      </Section>
+      <Section title='Blog'>
+        <ul class='flex flex-col gap-y-1.5 sm:gap-y-2'>{posts.slice(0, 6).map((post) => <PostPreview {post} />)}</ul>
+        <Button title='全部文章' class='w-fit self-end' href='/blog/' variant='ahead' />
+      </Section>
+      <Section title='Projects'>
+        {projects.slice(0, 3).map((project) => <LinkCard heading={project.name} subheading={project.description} date={project.tech} href={`/projects/${project.id}/`} target='_self' />)}
+        <Button title='全部工程实践' class='w-fit self-end' href='/projects/' variant='ahead' />
+      </Section>
+      <Section title='Skills'>
+        <SkillLayout title='Languages' skills={['JavaScript', 'TypeScript', 'Python', 'SQL']} />
+        <SkillLayout title='Web' skills={['React', 'FastAPI', 'PostgreSQL']} />
+        <SkillLayout title='Platform' skills={['微信小程序', 'CloudBase', 'Docker', 'Git']} />
+        <SkillLayout title='Focus' skills={['业务流程', '权限边界', 'AI 反馈', '验证与交付']} />
+      </Section>
+      <Section title='Contact'><p class='text-muted-foreground'>{site.contactIntroduction}</p><Button title='与我交流' class='w-fit self-end' href='/contact/' variant='ahead' /></Section>
+      <Section title='站点统计'><div class='grid grid-cols-2 gap-3'>{[{label:'文章',value:posts.length},{label:'工程实践',value:projects.length}].map(item => <div class='rounded-xl border bg-muted/30 px-4 py-3 text-center'><div class='text-2xl font-medium tabular-nums'>{item.value}</div><div class='mt-1 text-sm text-muted-foreground'>{item.label}</div></div>)}</div></Section>
+    </div>
+  </main>
+</PageLayout>

@@ -1,0 +1,14 @@
+---
+import { site } from '@/data/site'
+import PageLayout from '@/layouts/CommonPage.astro'
+import LinkCard from '@/components/home/LinkCard.astro'
+const info = `Name: ${site.title}\nDesc: ${site.description}\nLink: ${site.url}/\nAvatar: ${site.url}/assets/avatar.webp`
+---
+<PageLayout title='Links'>
+  <p>经常查阅的官方文档与工程资料。</p>
+  <LinkCard href='https://docs.astro.build/' heading='Astro' subheading='静态网站、内容集合与页面构建。' />
+  <LinkCard href='https://developers.weixin.qq.com/miniprogram/dev/framework/' heading='微信小程序文档' subheading='原生 API、组件与开发工具。' />
+  <LinkCard href='https://docs.cloudbase.net/' heading='CloudBase 文档' subheading='身份、云函数、数据库与部署。' />
+  <LinkCard href='https://docs.github.com/' heading='GitHub Docs' subheading='Git、协作流程、Actions 与 Pages。' />
+  <h2>本站信息</h2><pre>{info}</pre><button class='not-prose rounded-full border px-4 py-2 hover:bg-muted' data-copy={info}>复制网站信息</button>
+</PageLayout>

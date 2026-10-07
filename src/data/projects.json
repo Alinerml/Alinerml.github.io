@@ -1,0 +1,54 @@
+[
+  {
+    "id": "crm-workbench",
+    "name": "CRM 与客服工作台",
+    "tech": "React · FastAPI · PostgreSQL",
+    "description": "围绕客户、客服和门店协作，整理业务入口、共享界面与权限边界。",
+    "focus": "客服工作流 · 共享组件 · 身份与权限边界",
+    "url": "https://github.com/Alinerml",
+    "linkLabel": "GitHub 主页",
+    "status": "工程实践记录",
+    "boundary": "本页整理参与和关注的工程方向；具体功能状态以对应代码与验证记录为准。",
+    "group": "工程实践",
+    "updated": "2026-10-07"
+  },
+  {
+    "id": "wechat-mini-program",
+    "name": "微信小程序工程实践",
+    "tech": "JavaScript · 微信小程序 · CloudBase",
+    "description": "从页面交互到登录、媒体与环境配置，让小程序的每一步行为都有清晰依据。",
+    "focus": "原生身份 · 页面生命周期 · 配置与发布验证",
+    "url": "https://github.com/Alinerml",
+    "linkLabel": "GitHub 主页",
+    "status": "工程实践记录",
+    "boundary": "本页整理参与和关注的工程方向；具体功能状态以对应代码与验证记录为准。",
+    "group": "工程实践",
+    "updated": "2026-10-07"
+  },
+  {
+    "id": "ai-feedback",
+    "name": "AI 回复与反馈记录",
+    "tech": "React · Python · PostgreSQL · CloudBase",
+    "description": "关注回复生成时的真实输入、候选反馈与可追溯记录，减少问题复盘中的猜测。",
+    "focus": "输入快照 · 候选反馈 · 报表与导出",
+    "url": "https://github.com/Alinerml",
+    "linkLabel": "GitHub 主页",
+    "status": "工程实践记录",
+    "boundary": "本页整理参与和关注的工程方向；具体功能状态以对应代码与验证记录为准。",
+    "group": "工程实践",
+    "updated": "2026-10-07"
+  },
+  {
+    "id": "engineering-tooling",
+    "name": "开发环境与交付诊断",
+    "tech": "Git · Docker · Windows / WSL",
+    "description": "记录跨平台开发、工作目录管理和验证过程，把环境问题拆成可以复现的步骤。",
+    "focus": "环境边界 · 工作目录一致性 · 交付证据",
+    "url": "https://github.com/Alinerml",
+    "linkLabel": "GitHub 主页",
+    "status": "工程实践记录",
+    "boundary": "本页整理参与和关注的工程方向；具体功能状态以对应代码与验证记录为准。",
+    "group": "工程实践",
+    "updated": "2026-10-07"
+  }
+]

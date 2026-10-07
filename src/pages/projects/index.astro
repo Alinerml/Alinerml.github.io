@@ -1,0 +1,13 @@
+---
+import { projects, site } from '@/data/site'
+import PageLayout from '@/layouts/CommonPage.astro'
+import ProjectSection from '@/components/projects/ProjectSection.astro'
+const headings = [{depth:2,slug:'engineering',text:'工程实践'}]
+const list = projects.map(project => ({id:project.id,name:project.name,description:project.description,links:[{type:'doc',href:`/projects/${project.id}/`}]}))
+---
+<PageLayout title='Projects' {headings}>
+  <p>参与和关注的工程方向，围绕业务流程、身份边界、AI 反馈与验证展开。</p>
+  <p><a href={site.github} target='_blank' rel='noopener noreferrer'>GitHub · Alinerml</a></p>
+  <h2 id='engineering'>工程实践</h2>
+  <ProjectSection project={list} />
+</PageLayout>

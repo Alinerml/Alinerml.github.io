@@ -1,0 +1,12 @@
+---
+import { Button } from 'astro-pure/user'
+import PageLayout from '@/layouts/BaseLayout.astro'
+---
+
+<PageLayout meta={{ title: '404', description: '页面未找到', noindex: true }}>
+  <main id='main' class='my-20 flex flex-col items-center gap-y-6'>
+    <h1 class='text-3xl font-medium'>404 · Page Not Found</h1><p class='text-muted-foreground'>
+      这条路径还没有内容。
+    </p><Button title='Back to Home' href='/' variant='ahead' />
+  </main>
+</PageLayout>

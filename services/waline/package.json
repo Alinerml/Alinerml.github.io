@@ -2,10 +2,15 @@
   "name": "alinerml-waline",
   "private": true,
   "version": "1.0.0",
-  "engines": { "node": "24.x" },
-  "scripts": { "dev": "node dev.cjs" },
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "node dev.cjs"
+  },
   "dependencies": {
-    "@waline/vercel": "1.43.4"
+    "@waline/vercel": "1.43.4",
+    "pg": "8.23.1"
   },
   "overrides": {
     "request": "npm:@cypress/request@4.0.1",

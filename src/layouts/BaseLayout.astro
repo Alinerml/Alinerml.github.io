@@ -5,6 +5,7 @@ import BaseHead from '@/components/BaseHead.astro'
 import Header from '@/components/Header.astro'
 import DevModeHost from '@/components/terminal/DevModeHost'
 import ThemeProvider from '@/components/ThemeProvider.astro'
+import VisitorPulse from '@/components/VisitorPulse.astro'
 import config from '@/site-config'
 
 // Import the global.css file here so that it is included on
@@ -48,6 +49,7 @@ const htmlLang = config.locale.lang
     <div class:list={['w-full', chrome && 'max-w-[70rem] px-4 sm:px-7 lg:px-10']}>
       {chrome && <Header />}
       <slot />
+      {chrome && <VisitorPulse />}
       {chrome && <Footer />}
     </div>
     <DevModeHost client:only='react' />

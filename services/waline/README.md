@@ -28,6 +28,16 @@ Node.js 24.15+，在此目录运行 `npm ci`、`npm run dev`，服务监听 http
 
 保护路由测试：`node test/registration-guard.test.cjs`；SQL 日志、TLS 与更新回读测试：`node --test test/sql-model.test.cjs`。GitHub Actions 中独立的 Waline 工作流执行这些检查。
 
+## 站点访问统计
+
+`/api/site-stats` 复用当前 PostgreSQL，首次启用时在已有数据库执行 `site-stats.pgsql`。此脚本仅幂等新增 `blog_site_stats` 和 `blog_site_visitors` 两张表、初始化一行总计，不修改任何 Waline 表或已有评论。请求过程中不会自动创建表。
+
+接口仅接受 `SITE_URL` 对应的 Origin。`GET` 读取 `{ visitors, views, startedAt }`；`POST` 接受唯一字段 `{ visitorId: "浏览器生成的 UUID" }`，返回相同格式；`OPTIONS` 用于预检。JSON 请求体上限 2 KB，响应不缓存；生产环境不会开放 localhost。单独调试 PostgreSQL 统计时，可在非生产进程显式设置 `SITE_STATS_DEV_ORIGINS=http://localhost:4173`。
+
+访客按浏览器保存的随机 ID 去重，不代表实名人数；清除浏览器数据或使用另一浏览器会计为新访客。数据库只保存该随机 ID 的 SHA-256 散列和全站累计数字，不记录访问路径、IP 或浏览器信息。没有可持久保存的浏览器 ID 时，前端只读取数字。计数从此迁移首次执行起累积，不补造之前的数据；每次完整页面访问只提交一次 POST，失败时仅 GET 重读，避免重试重复计数。
+
+统计服务测试：`node --test test/site-stats.test.cjs`，覆盖 Origin、方法、请求体限制、UUID 校验、事务回滚和 Waline 透传。并发与真实数据库验证范围以博客根目录 `VERIFICATION.md` 为准。本地 SQLite 评论演示不连接线上 PostgreSQL，也不提供统计接口。
+
 ## SQL 存储兼容
 
 `comment-model.cjs` 通过 Waline 自带的 custom model 接口包装 Comment 更新：过滤未定义字段，并回读完整记录。修复 1.43.4 在 SQL 存储中游客点赞写库后返回 500 的问题；本地 SQLite 已实测，线上 PostgreSQL 的最终读写验证见 `VERIFICATION.md`。没有修改 node_modules。

@@ -1,0 +1,190 @@
+---
+import { comments } from '@/data/comments'
+---
+
+{
+  comments.enabled && (
+    <site-pulse id='site-pulse' class='site-pulse' data-stats-url={`${comments.serverURL}/api/site-stats`} data-state='loading'>
+      <section class='pulse-panel' aria-labelledby='pulse-title'>
+        <div class='pulse-heading'>
+          <div class='pulse-title'><span aria-hidden='true'>❯</span><h2 id='pulse-title'>SITE PULSE<span>站点信号</span></h2></div>
+          <span class='pulse-status' role='status'><i aria-hidden='true' /><span data-status>连接统计</span></span>
+        </div>
+        <div class='pulse-body'>
+          <div class='pulse-radar' aria-hidden='true'>
+            <div class='pulse-sweep' /><i class='pulse-blip blip-one' /><i class='pulse-blip blip-two' />
+            <span class='pulse-core' />
+          </div>
+          <dl class='pulse-metrics'>
+            <div><dt>累计访客 <span>UV</span></dt><dd><span data-visitors>—</span><small>位</small></dd><dd class='pulse-hint'>按浏览器去重</dd></div>
+            <div><dt>浏览次数 <span>PV</span></dt><dd><span data-views>—</span><small>次</small></dd><dd class='pulse-hint'>记录每次页面打开</dd></div>
+          </dl>
+        </div>
+        <div class='pulse-bottom'>
+          <span class='pulse-since' data-since>从启用日起累计</span>
+          <details><summary>统计口径 <span aria-hidden='true'>↗</span></summary><p>访客使用保存在当前浏览器中的随机标识去重，服务端只保存标识的散列，不记录 IP。更换浏览器或清除存储会计为新访客；禁用存储时仅展示统计。数字从功能启用时开始累计，雷达为装饰。</p></details>
+          <button type='button' data-retry hidden>重新连接 ↻</button>
+        </div>
+      </section>
+      <noscript><p class='pulse-noscript'>启用 JavaScript 后可查看访问统计。</p></noscript>
+    </site-pulse>
+  )
+}
+
+<script>
+  interface SiteStats { visitors: number; views: number; startedAt: string }
+  const visitorKey = 'alinerml.visitor.v1'
+  const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
+  function visitorId(): string | null {
+    try {
+      let id = localStorage.getItem(visitorKey)
+      if (!id || !uuid.test(id)) {
+        id = crypto.randomUUID()
+        localStorage.setItem(visitorKey, id)
+      }
+      return id
+    } catch { return null }
+  }
+
+  class SitePulse extends HTMLElement {
+    private started = false
+    private pending = false
+    private stats: SiteStats | null = null
+    private observer?: IntersectionObserver
+    private visibility = () => {
+      if (document.visibilityState === 'visible') {
+        document.removeEventListener('visibilitychange', this.visibility)
+        this.start()
+      }
+    }
+
+    connectedCallback() {
+      this.querySelector('[data-retry]')?.addEventListener('click', () => this.load(null))
+      this.observer = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          this.dataset.inview = 'true'
+          this.renderNumbers()
+          this.observer?.disconnect()
+        }
+      }, { threshold: 0.15 })
+      this.observer.observe(this)
+      if (document.visibilityState === 'visible') this.start()
+      else document.addEventListener('visibilitychange', this.visibility)
+    }
+
+    disconnectedCallback() {
+      document.removeEventListener('visibilitychange', this.visibility)
+      this.observer?.disconnect()
+    }
+
+    private start() {
+      if (this.started) return
+      this.started = true
+      void this.load(visitorId())
+    }
+
+    private async load(id: string | null) {
+      if (this.pending) return
+      this.pending = true
+      this.dataset.state = 'loading'
+      this.querySelector<HTMLElement>('[data-status]')!.textContent = '连接统计'
+      const retry = this.querySelector<HTMLButtonElement>('[data-retry]')!
+      retry.hidden = true
+      try {
+        // One write per document. A retry only reads, even if a timed-out write committed.
+        const response = await fetch(this.dataset.statsUrl!, {
+          method: id ? 'POST' : 'GET',
+          ...(id ? { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ visitorId: id }) } : {}),
+          credentials: 'omit',
+          cache: 'no-store',
+          signal: AbortSignal.timeout(15000)
+        })
+        if (!response.ok) throw new Error('Statistics unavailable')
+        const stats: SiteStats = await response.json()
+        if (!Number.isSafeInteger(stats.visitors) || !Number.isSafeInteger(stats.views) || stats.visitors < 0 || stats.views < stats.visitors || !Number.isFinite(Date.parse(stats.startedAt))) throw new Error('Invalid statistics')
+        this.stats = stats
+        this.dataset.state = 'ready'
+        this.querySelector<HTMLElement>('[data-status]')!.textContent = '已同步'
+        const date = new Date(stats.startedAt).toLocaleDateString('zh-CN', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('/', '.')
+        this.querySelector<HTMLElement>('[data-since]')!.textContent = `SINCE ${date}`
+        if (this.dataset.inview) this.renderNumbers()
+      } catch {
+        this.dataset.state = 'error'
+        this.querySelector<HTMLElement>('[data-status]')!.textContent = '暂未连接'
+        retry.hidden = false
+      } finally { this.pending = false }
+    }
+
+    private renderNumbers() {
+      if (!this.stats) return
+      for (const [selector, value] of [['[data-visitors]', this.stats.visitors], ['[data-views]', this.stats.views]] as const) {
+        const element = this.querySelector<HTMLElement>(selector)!
+        element.textContent = new Intl.NumberFormat('zh-CN').format(value)
+        if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          element.animate([{ opacity: 0, transform: 'translateY(9px)', filter: 'blur(3px)' }, { opacity: 1, transform: 'translateY(0)', filter: 'blur(0)' }], { duration: 550, easing: 'cubic-bezier(.16,1,.3,1)' })
+        }
+      }
+    }
+  }
+  if (!customElements.get('site-pulse')) customElements.define('site-pulse', SitePulse)
+</script>
+
+<style>
+  .site-pulse { display: block; max-width: 44rem; margin: 4.5rem auto -1.5rem; scroll-margin-top: 6rem; --pulse-accent: 196 64% 40%; --pulse-pink: 334 67% 63%; }
+  :global(.dark) .site-pulse { --pulse-accent: 187 84% 73%; }
+  .pulse-panel { position: relative; isolation: isolate; overflow: hidden; border: 1px solid hsl(var(--pulse-accent) / .26); border-radius: 1.1rem; padding: 1.15rem 1.4rem 1rem; background: linear-gradient(120deg, hsl(var(--pulse-accent) / .045), transparent 56%, hsl(var(--pulse-pink) / .035)), hsl(var(--background)); box-shadow: 0 8px 32px hsl(var(--pulse-accent) / .045), inset 0 1px 0 hsl(var(--pulse-accent) / .09); }
+  .pulse-panel::before { content: ''; position: absolute; z-index: -1; inset: 0; opacity: .24; background-image: radial-gradient(hsl(var(--pulse-accent) / .35) .6px, transparent .6px); background-size: 12px 12px; mask-image: linear-gradient(90deg, black, transparent 70%); }
+  .pulse-panel::after { content: ''; position: absolute; inset: 0 auto auto 12%; width: 35%; height: 1px; background: linear-gradient(90deg, transparent, hsl(var(--pulse-accent) / .75), transparent); }
+  .pulse-heading, .pulse-title, .pulse-status, .pulse-bottom { display: flex; align-items: center; }
+  .pulse-heading { justify-content: space-between; gap: .75rem; }
+  .pulse-title { gap: .65rem; color: hsl(var(--pulse-accent)); }
+  h2 { display: flex; align-items: center; flex-wrap: wrap; column-gap: .7rem; font: 600 .73rem/1.8 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .1em; }
+  h2 span { font-size: .73rem; font-weight: 400; letter-spacing: .03em; color: hsl(var(--muted-foreground)); }
+  .pulse-status { flex-shrink: 0; gap: .4rem; font-size: .65rem; color: hsl(var(--muted-foreground)); }
+  .pulse-status i { width: 5px; height: 5px; border-radius: 50%; background: hsl(var(--muted-foreground) / .6); }
+  [data-state='ready'] .pulse-status i { background: #27a77b; box-shadow: 0 0 7px #27a77b66; }
+  .pulse-body { display: flex; align-items: center; gap: 2rem; padding: 1.55rem 0 1.3rem; }
+  .pulse-radar { position: relative; flex: 0 0 86px; height: 86px; border-radius: 50%; border: 1px solid hsl(var(--pulse-accent) / .3); overflow: hidden; background: repeating-radial-gradient(circle, transparent 0 13px, hsl(var(--pulse-accent) / .18) 13px 14px), linear-gradient(transparent calc(50% - .5px), hsl(var(--pulse-accent) / .18) 50%, transparent calc(50% + .5px)), linear-gradient(90deg, transparent calc(50% - .5px), hsl(var(--pulse-accent) / .18) 50%, transparent calc(50% + .5px)); }
+  .pulse-sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, transparent 270deg, hsl(var(--pulse-accent) / .02) 285deg, hsl(var(--pulse-accent) / .3) 359deg, transparent 360deg); animation: radar-sweep 9s linear infinite; animation-play-state: paused; }
+  [data-inview] .pulse-sweep { animation-play-state: running; }
+  .pulse-core { position: absolute; inset: 50% auto auto 50%; width: 4px; height: 4px; transform: translate(-50%, -50%); border-radius: 50%; background: hsl(var(--pulse-accent)); box-shadow: 0 0 8px hsl(var(--pulse-accent) / .6); }
+  .pulse-blip { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: hsl(var(--pulse-pink)); box-shadow: 0 0 7px hsl(var(--pulse-pink) / .6); }
+  .blip-one { top: 23%; left: 66%; }
+  .blip-two { top: 69%; left: 27%; width: 3px; height: 3px; opacity: .65; }
+  .pulse-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); flex: 1; min-width: 0; gap: 1.5rem; }
+  .pulse-metrics > div + div { padding-left: 1.5rem; border-left: 1px solid hsl(var(--pulse-accent) / .16); }
+  dt { display: flex; align-items: center; gap: .5rem; color: hsl(var(--muted-foreground)); font-size: .75rem; }
+  dt span { color: hsl(var(--pulse-accent)); font: .6rem ui-monospace, SFMono-Regular, Consolas, monospace; opacity: .85; }
+  dd { display: flex; align-items: baseline; gap: .5rem; padding: .25rem 0 .2rem; }
+  dd > span { font: 500 clamp(1.3rem, 3.5vw, 2.1rem)/1.3 ui-monospace, SFMono-Regular, Consolas, monospace; font-variant-numeric: tabular-nums; letter-spacing: -.04em; color: hsl(var(--foreground)); overflow-wrap: anywhere; }
+  dd small { font-size: .65rem; color: hsl(var(--muted-foreground)); }
+  .pulse-metrics .pulse-hint { display: block; padding: 0; font-size: .62rem; color: hsl(var(--muted-foreground)); opacity: .8; }
+  .pulse-bottom { position: relative; gap: 1rem; flex-wrap: wrap; padding-top: .75rem; border-top: 1px solid hsl(var(--pulse-accent) / .12); color: hsl(var(--muted-foreground)); font-size: .64rem; }
+  .pulse-since { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .035em; }
+  details { margin-left: auto; }
+  summary { cursor: pointer; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary span { color: hsl(var(--pulse-accent)); }
+  details p { margin: .8rem 0 0; max-width: 30rem; line-height: 1.9; font-size: .7rem; }
+  details[open] { margin-left: 0; order: 3; flex-basis: 100%; }
+  button { color: hsl(var(--pulse-accent)); cursor: pointer; }
+  button[hidden] { display: none; }
+  .pulse-noscript { margin-top: .5rem; text-align: center; font-size: .75rem; }
+  @keyframes radar-sweep { to { transform: rotate(360deg); } }
+  @media (max-width: 480px) {
+    .site-pulse { margin-top: 3rem; }
+    .pulse-panel { padding: 1rem; }
+    .pulse-body { gap: 1rem; }
+    .pulse-radar { flex-basis: 54px; height: 54px; }
+    .pulse-metrics { gap: .8rem; }
+    .pulse-metrics > div + div { padding-left: .8rem; }
+    dt { gap: .3rem; font-size: .68rem; }
+    dd { gap: .3rem; }
+    .pulse-metrics .pulse-hint { font-size: .58rem; }
+    h2 { font-size: .67rem; column-gap: .45rem; }
+    h2 span { font-size: .65rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .pulse-sweep { animation: none; } }
+  @media (max-width: 360px) { .pulse-radar { display: none; } }
+</style>

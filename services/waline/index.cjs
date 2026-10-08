@@ -25,4 +25,4 @@ const handler = Waline({
   secureDomains: [new URL(process.env.SITE_URL || 'https://Alinerml.github.io').hostname, process.env.VERCEL_PROJECT_PRODUCTION_URL, process.env.VERCEL_URL]
     .filter(Boolean)
 });
-module.exports = require('./registration-guard.cjs')(handler);
+module.exports = require('./site-stats.cjs').withSiteStats(require('./registration-guard.cjs')(handler));
